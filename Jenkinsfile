@@ -1,38 +1,19 @@
 pipeline {
-    agent { 
-        node {
-            label 'docker-agent-python'
-            }
-      }
-    triggers {
-        pollSCM '* * * * *'
-    }
+    agent any
     stages {
+        stage('Fetch Code') {
+            steps {
+                git branch: 'paac', url: 'https://github.com/devopshydclub/vprofile-project.git'
+            }
+        }
         stage('Build') {
             steps {
-                echo "Building.."
-                sh '''
-                cd myapp
-                pip install -r requirements.txt
-                '''
+                sh 'mvn install'
             }
         }
         stage('Test') {
             steps {
-                echo "Testing.."
-                sh '''
-                cd myapp
-                python3 hello.py
-                python3 hello.py --name=Brad
-                '''
-            }
-        }
-        stage('Deliver') {
-            steps {
-                echo 'Deliver....'
-                sh '''
-                echo "doing delivery stuff.."
-                '''
+                sh 'mvn test'
             }
         }
     }
